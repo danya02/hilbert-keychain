@@ -61,7 +61,7 @@ def hilbert_points(depth, side_length):
     minp = min([i[1] for i in points]+[i[0] for i in points])/10
 
     unit_len = side_length / (maxp-minp)
-#    points = [(point[0]*unit_len, point[1]*unit_len) for point in points]
+    points = [(point[0]*unit_len, point[1]*unit_len) for point in points]
     
     minvx = min([i[0] for i in points])
     minvy = min([i[1] for i in points])

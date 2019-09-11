@@ -20,6 +20,7 @@ def points_to_gcode(points, cut_depth, cut_speed):
     o('G0 Z10') # raise head to safe distance
     o('G0 X0Y0') # revert to start position
     o('M30') # stop operation
+    return outp
 
 if __name__ == '__main__':
     points_to_gcode(eval(input()), -1, 100)
