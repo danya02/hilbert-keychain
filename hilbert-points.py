@@ -12,20 +12,20 @@ def hilbert_points(depth, side_length):
 
     def l(v):
         global x,y,direction
-        append()
         if v>0:
             direction -= 1
             if direction < 0:
                 direction = 3
         else:
-            r(-x)
+            r(-v)
     def r(v):
         global x,y,direction
-        append()
         if v>0:
             direction += 1
             if direction > 3: 
                 direction = 0
+        else:
+            l(-v)
 
     def f(v):
         global x,y,direction
@@ -38,6 +38,7 @@ def hilbert_points(depth, side_length):
             y+=1
         elif direction==3:
             x-=1
+        append()
 
     def hilbert(length, parity, depth):
         if depth==0:
@@ -53,14 +54,14 @@ def hilbert_points(depth, side_length):
         f(length)
         hilbert(length, -parity, depth-1)
         l(parity)
-    hilbert(1,1,depth)
+    hilbert(10,1,depth)
 
 
-    maxp = max([i[1] for i in points]+[i[0] for i in points])
-    minp = min([i[1] for i in points]+[i[0] for i in points])
+    maxp = max([i[1] for i in points]+[i[0] for i in points])/10
+    minp = min([i[1] for i in points]+[i[0] for i in points])/10
 
     unit_len = side_length / (maxp-minp)
-    points = [(point[0]*unit_len, point[1]*unit_len) for point in points]
+#    points = [(point[0]*unit_len, point[1]*unit_len) for point in points]
     
     minvx = min([i[0] for i in points])
     minvy = min([i[1] for i in points])
