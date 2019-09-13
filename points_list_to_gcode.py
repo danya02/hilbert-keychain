@@ -64,7 +64,7 @@ def points_to_gcode(points, cut_depth, cut_speed, curve_relative_radius=None):
     o('M30') # stop operation
     return outp
 
-def points_to_gcode_with_outline(points, cut_depth, cut_speed, workpiece_dimension, cutout_corners, cutout_depth, curve_relative_radius=None):
+def points_to_gcode_with_outline(points, cut_depth, cut_speed, workpiece_dimension, cutout_corners, cutout_depth, curve_relative_radius=None, hole_radius=None, hole_offset=None):
     outp = []
     if curve_relative_radius is not None and curve_relative_radius>0.5:
         print('warning: curve\'s relative radius is greater than 0.5, which may cause overlap', file=sys.stderr)
@@ -191,13 +191,22 @@ def points_to_gcode_with_outline(points, cut_depth, cut_speed, workpiece_dimensi
         # the head is now above the last curve point
         o(f'G1 X{points[-1][0]}Y{points[-1][1]}') # so we just draw a line to the final point
 
-    
+    # if we have a hole to cut, now is the last chance we will have to do it
+    if hole_radius is not None and hole_offset is not None:
+        ypos = ngon[0][1] # the hole is vertically next to the first point
+        xpos = hole_offset # and an x of 0 is the leftmost vertex
+        o('G0 Z10') # raise the head to safe distance
+        o(f'G0 X{xpos-hole_radius}Y{ypos}') # the hole's circle starts at the point that's offset by the radius
+        o(f'G1 Z{cutout_depth}') # descend
+        o(f'G2 X{xpos-hole_radius}Y{ypos}I{hole_radius}J0') # cut the circle
+
     # now it is time to cut the ngon
     o('G0 Z10') # raise the head to safe distance
     o(f'G0 X{ngon[0][0]}Y{ngon[0][1]}') # move over to the first point of the cutout
     o(f'G1 Z{cutout_depth}') # and lower to the cutout depth
     for i in ngon:
         o(f'G1 X{i[0]}Y{i[1]}') # cut to the next point
+
     o(f'G1 X{ngon[0][0]}Y{ngon[0][1]}') # cut the final edge
     
     # at this point the workpiece has probably separated from the base plate
