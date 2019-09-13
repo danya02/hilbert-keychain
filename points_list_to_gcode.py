@@ -125,6 +125,14 @@ def points_to_gcode_with_outline(points, cut_depth, cut_speed, workpiece_dimensi
     
     ngon = [(i[0]-ngoncx, i[1]-ngoncy) for i in ngon] # move the ngon so its center coincides with the workpiece's center
 
+    bx,by = 0,0 # now find the barycenter of the ngon
+    for i in ngon:
+        bx+=i[0]
+        by+=i[1]
+    bx/=len(ngon)
+    by/=len(ngon)
+
+
     # the shape needs to be scaled down so it is contained
     # inside of the ngon
 
@@ -150,8 +158,30 @@ def points_to_gcode_with_outline(points, cut_depth, cut_speed, workpiece_dimensi
     
 
 
-    points = [(i[0]*fac, i[1]*fac) for i in points] # scale all points relative to the center
     
+    points = [(i[0]*fac, i[1]*fac) for i in points] # scale all points relative to the center
+    points = [(i[0]+bx, i[1]+by) for i in points] # and move the points to the shape's barycenter
+
+
+    pointxmin *= fac
+    pointymin *= fac
+    pointxmax *= fac
+    pointymax *= fac
+
+    fac = 1.0
+
+
+    shape = box(pointxmin*fac,pointymin*fac,pointxmax*fac,pointymax*fac)
+    while shape.within(ngonpoly): # and now that the points have moved, we can rescale the shape again, this time until it just begins to emerge from the ngon
+        fac += step
+        shape = box(pointxmin*fac,pointymin*fac,pointxmax*fac,pointymax*fac)
+    fac -= step
+
+
+    
+    points = [(i[0]*fac, i[1]*fac) for i in points] # and scale the points again
+
+    # at this point, in a 5-gon, the shape is still neither in the visual center, nor even touching the sides of the 5-gon. still no idea how to make it better. 
 
     mx,my = 0,0 # now find the minimal coordinates
     for i in points+ngon:
