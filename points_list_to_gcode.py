@@ -222,7 +222,7 @@ def points_to_gcode_with_outline(points, cut_depth, cut_speed, workpiece_dimensi
         o(f'G1 X{points[-1][0]}Y{points[-1][1]}') # so we just draw a line to the final point
 
     # if we have a hole to cut, now is the last chance we will have to do it
-    if hole_radius is not None and hole_offset is not None:
+    if hole_radius is not None and hole_offset is not None and hole_radius>0:
         ypos = ngon[0][1] # the hole is vertically next to the first point
         xpos = hole_offset # and an x of 0 is the leftmost vertex
         o('G0 Z10') # raise the head to safe distance
